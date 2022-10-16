@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 
 pygame.init()
 HEIGHT = 500
@@ -49,10 +50,52 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
+images = ["images/bird_1.png", "images/bird_2.png"]
+
+
+class Duck(pygame.sprite.Sprite):
+
+    def __init__(self, image):
+        super().__init__()
+
+        self.image = pygame.image.load(image)
+        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.rect = self.image.get_rect()
+        self.rect.y = random.randint(0, 200)
+        self.rect.x = random.randint(-1000, -300)
+        self.speed = random.randint(3, 5)
+
+    def update(self):
+        self.rect.x += self.speed
+        if self.rect.x > 50:
+            self.image = pygame.image.load(images[1])
+            self.image = pygame.transform.scale(self.image, (50, 50))
+        if self.rect.x > 200:
+            self.image = pygame.image.load(images[0])
+            self.image = pygame.transform.scale(self.image, (50, 50))
+        if self.rect.x > 500:
+            self.image = pygame.image.load(images[0])
+            self.image = pygame.transform.scale(self.image, (50, 50))
+            self.rect.y = random.randint(0, 300)
+            self.rect.x = random.randint(-1000, -500)
+            self.speed = random.randint(3, 5)
+
+    @staticmethod
+    def add():
+
+        duck = Duck(images[0])
+        all_sprites.add(duck)
+        ducks.add(duck)
+
+
 player = Player()
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 all_sprites.add(player)
+ducks = pygame.sprite.Group()
+
+for duck in range(3):
+    Duck.add()
 
 while True:
     clock.tick(FPS)
