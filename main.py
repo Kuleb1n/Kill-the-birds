@@ -91,11 +91,48 @@ class Duck(pygame.sprite.Sprite):
         ducks.add(duck)
 
 
+class Recharge(pygame.sprite.Sprite):
+
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((10, 10))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.x = 250
+        self.rect.y = 300
+
+    def update(self):
+        text_3 = my_font.render('Recharge:', False, (0, 0, 0))
+
+        if count_bullets == 2:
+            self.rect.x += 2
+
+            pygame.draw.rect(screen, BLACK, (250, 300, 110, 10))
+            screen.blit(text_3, (240, 250))
+            if self.rect.x > 350:
+                self.kill()
+                self.rect.x = 250
+                self.rect.y = 300
+                reloading_weapons()
+
+        elif count_bullets < 2:
+            self.rect.x += 1
+            screen.blit(text_3, (240, 250))
+            pygame.draw.rect(screen, BLACK, (250, 300, 110, 10))
+
+            if self.rect.x > 350:
+                self.kill()
+                self.rect.x = 250
+                self.rect.y = 300
+                reloading_weapons()
+
+
 player = Player()
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 all_sprites.add(player)
 ducks = pygame.sprite.Group()
+update_bullet = Recharge()
 
 for duck in range(3):
     Duck.add()
@@ -156,8 +193,13 @@ while True:
         player.rect.x -= 10
     if count_bullets < 3:
         if key[pygame.K_r]:
-            list_Bullet.clear()
-            count_bullets = 3
+            all_sprites.add(update_bullet)
+
+
+            def reloading_weapons():
+                global count_bullets
+                list_Bullet.clear()
+                count_bullets = 3
 
     all_sprites.update()
     hits = pygame.sprite.groupcollide(bullets, ducks, True, True)
