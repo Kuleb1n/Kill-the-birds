@@ -3,14 +3,17 @@ import sys
 import random
 
 pygame.init()
-HEIGHT = 500
+HEIGHT = 550
 WIGHT = 500
 BLACK = (0, 0, 0)
-screen = pygame.display.set_mode((HEIGHT, WIGHT))
+GREEN = (0, 100, 0)
+screen = pygame.display.set_mode((WIGHT, HEIGHT))
 pygame.display.set_caption('Kill the birds')
 pygame.display.set_icon(pygame.image.load('images/icon_for_the_game.png'))
 clock = pygame.time.Clock()
-FPS = 60
+FPS = 90
+my_font = pygame.font.SysFont('Arial', 36)
+font_bullet = pygame.font.SysFont('Arial', 20)
 
 
 class Player(pygame.sprite.Sprite):
@@ -97,16 +100,52 @@ ducks = pygame.sprite.Group()
 for duck in range(3):
     Duck.add()
 
+count = 0
+count_bullets = 3
+list_Bullet = []
+
+
+def draw_bullet():
+    bullet_fly = pygame.image.load('Images/bullet.png')
+    bullet_fly = pygame.transform.scale(bullet_fly, (15, 20))
+    bullet_afk = pygame.image.load('Images/bullet_afk.png')
+    bullet_afk = pygame.transform.scale(bullet_afk, (15, 20))
+    text_3 = font_bullet.render('Bullets: ', False, (255, 0, 0))
+    pygame.draw.rect(screen, BLACK, (300, 500, 500, 300))
+    screen.blit(text_3, (300, 505))
+    if count_bullets == 3:
+        screen.blit(bullet_fly, (390, 510))
+        screen.blit(bullet_fly, (415, 510))
+        screen.blit(bullet_fly, (440, 510))
+    elif count_bullets == 2:
+        screen.blit(bullet_afk, (390, 510))
+        screen.blit(bullet_fly, (415, 510))
+        screen.blit(bullet_fly, (440, 510))
+    elif count_bullets == 1:
+        screen.blit(bullet_afk, (390, 510))
+        screen.blit(bullet_afk, (415, 510))
+        screen.blit(bullet_fly, (440, 510))
+    elif count_bullets == 0:
+        screen.blit(bullet_afk, (390, 510))
+        screen.blit(bullet_afk, (415, 510))
+        screen.blit(bullet_afk, (440, 510))
+
+
 while True:
     clock.tick(FPS)
+    text_1 = my_font.render(f'Count: {count}', False, (0, 0, 0))
     screen.fill(BLACK)
+    screen.blit(pygame.image.load('images/my_font.png'), (0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                player.shoot()
+                if len(list_Bullet) < 3:
+                    count_bullets -= 1
+                    player.shoot()
+                    list_Bullet.append('1')
 
     key = pygame.key.get_pressed()
     if key[pygame.K_d] and player.rect.x + 100 < WIGHT:
@@ -115,7 +154,20 @@ while True:
     elif key[pygame.K_a] and player.rect.x > 0:
         player.moving_to_the_left()
         player.rect.x -= 10
+    if count_bullets < 3:
+        if key[pygame.K_r]:
+            list_Bullet.clear()
+            count_bullets = 3
 
     all_sprites.update()
+    hits = pygame.sprite.groupcollide(bullets, ducks, True, True)
+    for hit in hits:
+        count += 1
+        Duck.add()
+
     all_sprites.draw(screen)
+    pygame.draw.rect(screen, GREEN, (0, 500, 500, 50))
+    screen.blit(text_1, (0, 500))
+    draw_bullet()
+
     pygame.display.update()
