@@ -7,6 +7,7 @@ HEIGHT = 550
 WIGHT = 500
 BLACK = (0, 0, 0)
 GREEN = (0, 100, 0)
+SPACE = True
 screen = pygame.display.set_mode((WIGHT, HEIGHT))
 pygame.display.set_caption('Kill the birds')
 pygame.display.set_icon(pygame.image.load('images/icon_for_the_game.png'))
@@ -171,6 +172,7 @@ def draw_bullet():
 while True:
     clock.tick(FPS)
     text_1 = my_font.render(f'Count: {count}', False, (0, 0, 0))
+    text_2 = my_font.render('Press R to recharge!', False, (0, 0, 0))
     screen.fill(BLACK)
     screen.blit(pygame.image.load('images/my_font.png'), (0, 0))
     for event in pygame.event.get():
@@ -178,11 +180,14 @@ while True:
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and SPACE is True:
                 if len(list_Bullet) < 3:
                     count_bullets -= 1
                     player.shoot()
                     list_Bullet.append('1')
+
+    if len(list_Bullet) == 3 and SPACE is True:
+        screen.blit(text_2, (150, 300))
 
     key = pygame.key.get_pressed()
     if key[pygame.K_d] and player.rect.x + 100 < WIGHT:
@@ -194,12 +199,15 @@ while True:
     if count_bullets < 3:
         if key[pygame.K_r]:
             all_sprites.add(update_bullet)
+            SPACE = False
 
 
             def reloading_weapons():
                 global count_bullets
+                global SPACE
                 list_Bullet.clear()
                 count_bullets = 3
+                SPACE = True
 
     all_sprites.update()
     hits = pygame.sprite.groupcollide(bullets, ducks, True, True)
